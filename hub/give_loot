@@ -1,0 +1,67 @@
+#!/bin/env python3
+from os import environ
+from sys import path, argv
+from random import randint
+from time import sleep
+
+env = environ.get
+path.append(env("GAME")) # my_whatever/game_docker
+from sql.sql_query import psql
+
+
+class give_loot(psql):
+    def __init__(self) -> None:
+        psql.__init__(self)
+        
+
+    def give(self):
+        # get units that earned
+        # give them xp and stuff, ig in proportion to the dmg they did 
+        while True:
+            mob_info = self.get_dead_mobs()
+                
+            if mob_info:
+                
+                xp_amount = mob_info['level'] * 10
+                self.give_xp(id=mob_info['last_attacker'], xp=xp_amount)
+                
+                # comfirmation
+                x = self.exec(f"update cave_1 set clear = true where id = {mob_info['id']};")
+                print(x)
+            else:
+                print('no matching mobs')
+            break
+            
+            
+            
+            
+        
+    def get_dead_mobs(self):
+        cmd = '''select id, level, last_attacker from cave_1 where hp = 0 and clear = false limit 1'''
+        self.exec(cmd)
+        data = self.fetch_dict()
+        if data:
+            data = data[0]
+        return data
+        
+
+    def give_xp(self, id: int, xp: int = 10):
+        self.exec(f'''update unit_info
+                 set xp = xp + {xp}
+                 where unit_id = {id}
+                 returning *;''')
+        unit = self.fetch_dict()[0]
+        
+        print(f"xp + 10, total {unit['xp']}")
+        return True
+
+    def delete_mob(self, id: int):
+        self.cmd(f'''delete from mobs
+                 where id = {id}
+                 returning *;''')
+
+
+if __name__ == "__main__":
+    give_loot().give()
+
+

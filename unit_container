@@ -1,0 +1,68 @@
+#!/bin/env python3
+from os import environ
+from sys import path, argv
+from random import randint
+from time import sleep
+
+env = environ.get
+path.append(env("GAME")) # my_whatever/game_docker
+from sql.sql_query import psql
+
+# creating separate container that 
+# - manage unit of the attacker
+
+# action 1: getting unit data, 
+# action 2: stating that unit is busy, and add container_id
+# action 3: exec query that takes att from unit and attack mob
+# action 4: if unit survive and mob is dead, generate loot
+
+class battle(psql):
+    def __init__(self, operator_id, attacking_id) -> None:
+        psql.__init__(self)
+        
+        self.operator_id, self.attacking_id = operator_id, attacking_id
+        self.hostname = env('HOSTNAME') # identify container
+        self.container_id = self.hostname if self.hostname is not None else 'cat'
+        self.unit_name = '' # identify unit/mob
+        
+        self.unit_to_manage, self.unit_to_attack = {'hp': 1}, {'hp': 1}
+
+        
+    def battle(self):
+        try:
+            while self.unit_to_manage['hp'] > 0 and self.unit_to_attack['hp'] > 0:
+                self.unit_to_manage = self.get_unit_data(mod='unit', id=self.operator_id)
+                self.unit_to_attack = self.get_unit_data(mod='mob', id=self.attacking_id)
+                print(self.unit_to_manage)
+                break
+            
+            
+            
+        except Exception as error:
+            print(error.args)
+        
+    
+        
+    
+    
+    
+    
+    
+    
+    
+    def get_unit_data(self, mod: str, id: int) -> dict:
+        mods = {'unit': ['unit_info', 'unit_id'],
+                'mob': ['cave_1', 'id']}    
+        
+        for n in mods:
+            if n == mod:
+                cmd = f'''select * from {mods[n][0]}
+                where {mods[n][1]} = {id}'''
+            
+                self.exec(cmd)
+                return self.fetch_dict()[0]
+
+if __name__ == "__main__":
+    b1 = battle(argv[1], argv[2]) # 1 unit id, # location_id/mob
+    b1.battle()
+

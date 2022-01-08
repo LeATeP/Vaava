@@ -1,0 +1,36 @@
+#!/bin/env python3
+
+from os import environ
+from sys import argv, path
+env = environ.get
+
+
+path.append(env("GAME")) # my_whatever/game_docker
+from sql.sql_query import psql
+
+
+def get_inv():
+    cmd = psql().cmd
+    
+    comm = "select pg.pid, pg.usesysid, pg.usename, pg.state, pg.query, pg.backend_start, pg.client_addr from pg_stat_activity as pg;"
+    
+    inventory = cmd(comm)
+        
+    for n in range(len(inventory)):
+        if inventory[n]['usename'] != 'postgres':
+            continue
+        
+        for q in inventory[n]:
+            print(q, inventory[n][q])
+        
+        print('------------------------------------------------')
+        
+if __name__ == "__main__":
+    get_inv()
+        
+
+
+
+
+
+

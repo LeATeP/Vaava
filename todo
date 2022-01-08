@@ -1,0 +1,37 @@
+#!/bin/env bash
+
+TODO 1: think what can be mined at first
+TODO 2: complete random mechanism
+TODO 3: complete random of rarity (for workers and ore)
+TODO 4: make enemy and make basic battle 
+TODO 5: make xp, make levels, and trigger by level difference... each update trigger check if xp is enough, 
+and each level update, trigger stats update 
+TODO 6: make locations where mobs is... showing amount of mobs and level range
+
+
+# after done with battle mode, the foundation of the game basically done
+# so the rest is to make it's working flawlessly inside single image
+
+# the release version include: 
+# - unit that cost 10 energy rocks to summon, 
+# the more rocks the more quality unit will be at random
+# - will be battle, so units expendable the more you battle
+# so you have to manage mining resources and defend your territory/getting new
+# - average amount of containers is about 10 beginner, 100 advance for mining 
+# and warriors units at each new location, or battle
+
+# so after everything done, i will have to learn k8s to manage them
+
+1. make script/container add container SSH into sql
+2. make monitoring container that checks if container with those SSH exist
+# if no, then put working to false 
+# ig it should be done at k8s, monitoring container
+
+
+### reward plan
+1. when mob hp = 0, or when location is clear.. 
+sql make a trigger to give reward to specific team that located on this location
+earn xp formula is.. mob_xp * number = total xp / team_number that survived 
+level_xp: 
+lvl * 10 * tenth of total level.. like if your lvl 10, multiple by 1
+

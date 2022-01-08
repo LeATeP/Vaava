@@ -1,0 +1,73 @@
+#!/bin/env python3
+
+from prettytable import PrettyTable
+from os import environ
+from sys import argv, path
+env = environ.get
+
+
+path.append(env("GAME")) # my_whatever/game_docker
+from sql.sql_query import psql
+from utils.colors import fg_rgb
+
+class fetch_data():
+    def __init__(self) -> None:
+        '''possible flags: -s[select] for specific value-t[table] for specific table 
+            -i[index] or -n[name] for identifying specific item'''
+
+        self.p = psql()
+
+        self.cmd = ''
+        self.first_sql_line() 
+        self.second_sql_line()
+        
+
+        try:
+            self.p.exec(self.cmd)
+            fetched_data = self.p.fetch_dict()
+            
+            self.make_table(fetched_data)
+            
+        except (Exception) as error:
+            print(error.args)
+
+
+    def make_table(self, data):
+        keys = data[0].keys()
+        table = PrettyTable(list(keys))
+        
+        for item in data.values():
+            # item['grade'] = fg_rgb(item['grade'])
+            qq = list(item.values())
+            
+            table.add_row(qq)
+        
+        print(table)
+
+    def first_sql_line(self):
+        if len(argv) > 1: # table
+            self.cmd = f'select * from {argv[1]}\n'
+        else:
+            self.cmd = f'select * from items\n'
+
+    def second_sql_line(self):
+        keys = {'-i': 'id =',
+                '-n': 'name ='}
+        for n in keys:
+            if n in argv: # index
+                index = argv.index(n) + 1
+                value = argv[index]
+                self.cmd += f"where {keys[n]} '{value}'\n"
+                break
+        
+        self.cmd += 'order by id;'
+        
+
+if __name__ == "__main__":
+    fetch_data()
+
+
+
+
+
+

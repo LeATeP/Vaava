@@ -1,0 +1,49 @@
+#!/bin/env python3
+from os import environ
+from sys import argv, path
+
+env = environ.get
+
+path.append(env("GAME")) # my_whatever/game_docker
+from hub.wrap import init_conn
+
+
+
+def conn(cmd):
+    inventory = cmd['get'](table="items")
+    
+    if len(argv) > 1:
+        print(f"Comressing {argv[1]}: {argv[2]}")
+        for n in inventory:
+            if argv[1] == inventory[n]['name']:
+                available = inventory[n]['amount']
+                break
+            
+        num = int(argv[2])
+        if available >= num and num % 100 == 0:
+            # remove resources from sql
+            cmd['update'](amount=argv[2], operator="-", item_name=argv[1])
+            # add resources
+            num = int(num / 100)
+            cmd['update'](amount=num, item_name="Energy rock")
+                
+            print("Compress finished")
+            print(f"You got Energy rock: {num}")    
+        
+    else:
+        print("To compress you have to put 100 material for each")
+        
+        
+
+    
+
+
+if __name__ == "__main__":
+    init_conn(conn)
+        
+
+
+
+
+
+

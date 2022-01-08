@@ -1,0 +1,65 @@
+create table items (
+id serial primary key,
+name text unique,
+amount int default 0 check (0 <= amount <= amount_limits),
+amount_limits int default 10000,
+drop_chance int default 3
+);
+
+create table unit (
+id serial primary key,
+name text default 'Human',
+state text default 'idle',
+grade text default 'common',
+level int default 1,
+job text default 'None'
+);
+
+create table unit_info (
+id serial primary key,
+unit_id int unique references unit(id) not null,
+level int default 1,
+xp int default 0,
+hp int default 5
+    check (unit_info.hp <= unit_info.max_hp),
+    check (unit_info.hp >= 0),
+max_hp int default 5,
+attack int default 1,
+container_id text default null
+);
+
+insert into unit_info (unit_id, max_hp, hp)
+values (39,
+        (select level from unit where id = 39) * 5,
+        (select level from unit where id = 39) * 5)
+returning *;
+
+update unit_info
+set hp = hp - (select attack from unit_info where id = 1)
+where id = 2
+returning id;
+
+
+create table cave_1 (
+    id serial primary key,
+    level int default 1,
+    hp int default 5
+        check (cave_1.hp <= cave_1.max_hp),
+        check (cave_1.hp >= 0),
+    max_hp int default 5,
+    attack int default 1);
+
+insert into cave_1 (level)
+values (1), (1), (2), (1);
+
+select * from cave_1;
+
+select * from information_schema.tables
+where table_schema = 'public';
+
+select unit_id,
+       hp || '/' || max_hp as hp,
+       id * 5 as sum,
+       length('asd') as len
+from unit_info
+order by sum desc, id nulls last;

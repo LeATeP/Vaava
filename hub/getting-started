@@ -1,0 +1,5 @@
+#!/bin/env bash
+
+echo "Welcome, you have 10 energy rock's 
+To summon your first worker start 'worker_1_lvl'"
+

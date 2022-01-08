@@ -1,0 +1,86 @@
+#!/bin/env python3
+from os import environ
+from sys import path, argv
+from random import randint
+from time import sleep
+
+env = environ.get
+path.append(env("GAME")) # my_whatever/game_docker
+from sql.sql_query import psql
+
+# creating separate container that 
+# - manage unit of the attacker
+
+# action 1: getting unit data, 
+# action 2: stating that unit is busy, and add container_id
+# action 3: exec query that takes att from unit and attack mob
+# action 4: if unit survive and mob is dead, generate loot
+
+class battle(psql):
+    def __init__(self, unit_id, enemy_id) -> None:
+        psql.__init__(self)
+        
+        
+        self.unit_id = unit_id
+        self.enemy_id = enemy_id
+    
+    def start(self) -> None:
+        while True:
+            unit = self.get_units_data('unit')
+            enemy = self.get_units_data('enemy')
+
+            if not unit or not enemy:
+                break
+            if unit['hp'] <= 0 or enemy['hp'] <= 0:
+                break
+            
+            enemy = self.attack_('enemy')
+            # unit = self.attack_('unit')                        
+            print(f"unit_hp: {unit['hp']}/{unit['max_hp']}")
+            print(f"enemy_hp: {enemy['hp']}/{enemy['max_hp']}")
+            break
+        
+            
+
+    def get_units_data(self, mod: str):
+        if mod == 'unit':
+            self.exec(f'''select hp, max_hp from unit_info
+                    where unit_id = {self.unit_id};''')
+            data = self.fetch_dict()
+            if data:
+                return data[0]
+            print('no unit found')
+            return False
+        
+        elif mod == 'enemy':
+            self.exec(f'''select hp, max_hp from cave_1
+                    where id = {self.enemy_id};''')
+            data = self.fetch_dict()
+            if data:
+                return data[0]
+            print('no enemies found')
+            return False
+
+
+    def attack_(self, mod):
+        if mod == 'unit':
+            self.exec(f'''update unit_info
+                set hp = hp - (select attack from mobs where id = {self.enemy_id})
+                where id = {self.unit_id}
+                returning *;''')
+            return self.fetch_dict()[0]
+            
+        elif mod == 'enemy':
+            self.exec(f'''update cave_1
+                set hp = hp - (select attack from unit_info where unit_id = {self.unit_id}),
+                    last_attacker = {self.unit_id}
+                where id = {self.enemy_id}
+                returning *;''')
+            return self.fetch_dict()[0]
+
+
+if __name__ == "__main__":
+    b1 = battle(argv[1], argv[2])
+    b1.start()
+
+

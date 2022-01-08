@@ -1,0 +1,60 @@
+#!/bin/env python3
+from os import environ
+from sys import argv, path
+
+env = environ.get
+
+path.append(env("GAME")) # my_whatever/game_docker
+from sql.sql_query import psql
+from utils.colors import fg_rgb
+
+
+class work_class(psql):
+    def __init__(self) -> None:
+        psql.__init__(self)
+        
+        self.req_resource = 'energy_rock'
+        self.summom_cost = 10
+    
+    def start_work(self):
+        try:
+            cmd = f'''update items 
+            set amount = amount - {self.summom_cost} 
+            where name = '{self.req_resource}' 
+            returning amount;'''
+            self.exec(cmd)
+            amount = self.fetch_dict()
+            
+            print('Your balance:', amount[0]['amount'])
+            
+            self.exec('''insert into unit (name) 
+                                values ('Human') 
+                                returning *;''')
+            unit = self.fetch_dict()
+            
+            self.exec(f'''insert into unit_info (unit_id)
+                              values ({unit[0]['id']})
+                              returning *;''')
+            unit_info = self.fetch_dict()
+            [print(f"{i}: {unit[0][i]}") for i in unit[0]]
+            print(fg_rgb(unit_info))
+        except (Exception) as error:
+            print(error.args)
+ 
+ 
+
+    def check_stock(self):
+        try:
+            check_quantity = self.exec('''select amount from items
+                                 where name = 'Rock';''')
+            for n in check_quantity:
+                if check_quantity[n]['amount'] < self.summon_cost:
+                    print('you dont have enough materials')
+        
+        except Exception:
+            pass
+        
+        
+if __name__ == "__main__":
+    work_class().start_work()
+    
