@@ -13,7 +13,7 @@ class mining(psql):
     def __init__(self) -> None:
         psql.__init__(self)
         # self.host_name = env('HOSTNAME')
-    
+
     def start_work(self):
         try:
             self.exec('''select id from unit
@@ -22,7 +22,7 @@ class mining(psql):
             # if no worker are available then break
             if not data:
                 raise Exception('no worker are Free')
-            
+
             # change worker status on True
             id = data[0]['id']
             self.exec(f'''update unit set state = 'mining'
