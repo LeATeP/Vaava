@@ -5,7 +5,7 @@ from random import randint
 from time import sleep
 
 env = environ.get
-path.append(env("GAME")) # my_whatever/game_docker
+path.append(env("vaava")) # my_whatever/game_docker
 from sql.sql_query import psql
 
 # creating separate container that 
@@ -16,19 +16,30 @@ from sql.sql_query import psql
 # action 3: exec query that takes att from unit and attack mob
 # action 4: if unit survive and mob is dead, generate loot
 
-class battle(psql):
-    def __init__(self, operator_id, attacking_id) -> None:
+class auto_unit(psql):
+    '''description, how unit is working... ideas only    
+    1. script takes all params req to operate, from sql query
+    2. each script should depermine free unit to assing himself to, 
+    if free unit now exist in db, something wrong with data, or this container shouldn't exist
+    3. each unit has assigned "location" and location to look out for,
+    in case of moster or container is comster itself attack
+    4. unit should play their role assigned in prior by specifications at the start(new) of container
+    
+    '''
+    
+    
+    def __init__(self) -> None:
         psql.__init__(self)
         
-        self.operator_id, self.attacking_id = operator_id, attacking_id
         self.hostname = env('HOSTNAME') # identify container
-        self.container_id = self.hostname if self.hostname is not None else 'cat'
-        self.unit_name = '' # identify unit/mob
+        print(self.hostname)
+        # self.container_id = self.hostname if self.hostname is not None else 'cat'
+        # self.unit_name = '' # identify unit/mob
         
-        self.unit_to_manage, self.unit_to_attack = {'hp': 1}, {'hp': 1}
+        # self.unit_to_manage, self.unit_to_attack = {'hp': 1}, {'hp': 1}
 
         
-    def battle(self):
+    def unit(self):
         try:
             while self.unit_to_manage['hp'] > 0 and self.unit_to_attack['hp'] > 0:
                 self.unit_to_manage = self.get_unit_data(mod='unit', id=self.operator_id)
@@ -63,6 +74,6 @@ class battle(psql):
                 return self.fetch_dict()[0]
 
 if __name__ == "__main__":
-    b1 = battle(argv[1], argv[2]) # 1 unit id, # location_id/mob
-    b1.battle()
+    b1 = auto_unit()
+    # b1.unit()
 

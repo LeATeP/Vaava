@@ -8,10 +8,10 @@ env = environ.get
 
 class psql:
     def __init__(self) -> None:
-        self.conn = connect(host=str(env("POSTGRES_HOST")), 
-                           database=str(env("POSTGRES_DB")), 
-                           user=str(env("POSTGRES_USER")), 
-                           password=str(env("POSTGRES_PASSWORD")))
+        self.conn = connect(host=str(env("PSQL_HOST")), 
+                           database=str(env("PSQL_DB")), 
+                           user=str(env("PSQL_USER")), 
+                           password=str(env("PGPASSWORD")))
         self.conn.set_session(autocommit=True)
         self.curs = self.conn.cursor()
         
