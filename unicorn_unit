@@ -5,11 +5,10 @@ from random import randint
 from time import sleep
 
 env = environ.get
-path.append(env("vaava")) # my_whatever/game_docker
+path.append(env("vaava")) # export vaava=/Vaava
 from sql.sql_query import psql
 
-# creating separate container that 
-# - manage unit of the attacker
+# creating separate container that manage any unit
 
 # action 1: getting unit data, 
 # action 2: stating that unit is busy, and add container_id
