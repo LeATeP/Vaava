@@ -27,24 +27,33 @@ class auto_unit(psql):
     '''
     
     
-    def __init__(self) -> None:
+    def __init__(self, id, state: str = 'working') -> None:
         psql.__init__(self)
         
+        self.id = id
         self.hostname = env('HOSTNAME') # identify container
         if self.hostname == None: self.hostname = "main"
         
-        print(self.hostname)
+        self.exec(f"select id, name, state from unit where id = {self.id};")
+        unit_info = self.fetch_dict()
+        
+        if not unit_info: return None 
+        if unit_info[0]['state'] != 'idle': return None
         
         
-    def create_unit():
-        pass
+        self.exec(f"update unit set state = '{state}', container_id = '{self.hostname}';")
         
+        return True
+        
+    def exit_status(self):
+        self.exec(f"update unit set state = 'idle', container_id = null;")
         
         
 
     # main loop
     # def n1: find free unit to assing to, check sql if unit free
-    # def n2: put container id into sql/unit, so manager container can trash this unit if is alive
+    # def n2: put container id into sql/unit
+    # so manager container can change status of unit if container is dead
     # def n3: while look, look out for potential enemy's 
     # def n4: attack if enemy spotted, all actions of attack, going through sql, 
     # taking reference of stats from sql in each operation
@@ -60,6 +69,6 @@ class auto_unit(psql):
     
 
 if __name__ == "__main__":
-    b1 = auto_unit()
+    b1 = auto_unit(argv[1])
     # b1.unit()
 

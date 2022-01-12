@@ -5,7 +5,7 @@ from random import randint
 from time import sleep
 
 env = environ.get
-path.append(env("GAME")) # my_whatever/game_docker
+path.append(env("vaava"))
 from sql.sql_query import psql
 from utils.colors import fg_rgb
 
@@ -33,7 +33,7 @@ class mining(psql):
             while good:
                 sleep(0.1)
                 drop = self.gen_drop()
-                print(drop)
+                print(fg_rgb(drop))
                 for item in drop:
                     res = self.exec(f'''update items
                     set amount = amount + {drop[item]}
