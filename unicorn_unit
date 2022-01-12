@@ -27,26 +27,39 @@ class auto_unit(psql):
     '''
     
     
-    def __init__(self, id, state: str = 'working') -> None:
+    def __init__(self, unit_id: int, state: str = 'Working') -> None:
         psql.__init__(self)
         
-        self.id = id
+        self.id = unit_id
+        self.state = state
         self.hostname = env('HOSTNAME') # identify container
         if self.hostname == None: self.hostname = "main"
         
-        self.exec(f"select id, name, state from unit where id = {self.id};")
+        
+    def init_unit(self) -> bool:
+        self.exec(f"""
+                  select id, state, container_id 
+                  from unit 
+                  where id = {self.id};""")
+
         unit_info = self.fetch_dict()
+        if not unit_info: return False
+        if unit_info[0]['state'] != 'idle': return False
+        if unit_info[0]['container_id'] != None: return False
         
-        if not unit_info: return None 
-        if unit_info[0]['state'] != 'idle': return None
-        
-        
-        self.exec(f"update unit set state = '{state}', container_id = '{self.hostname}';")
+        self.exec(f"""
+                  update unit 
+                  set state = '{self.state}', container_id = '{self.hostname}' 
+                  where id = {self.id};""")
         
         return True
-        
+    
+    
     def exit_status(self):
-        self.exec(f"update unit set state = 'idle', container_id = null;")
+        self.exec(f"""
+                  update unit 
+                  set state = 'idle', container_id = null 
+                  where id = {self.id};""")
         
         
 
@@ -70,5 +83,6 @@ class auto_unit(psql):
 
 if __name__ == "__main__":
     b1 = auto_unit(argv[1])
-    # b1.unit()
+    x = b1.init_unit()
+    print(x)
 
