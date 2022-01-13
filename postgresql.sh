@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 # to open db =  docker exec -it 938 psql -U postgres sql
             # container-id / pgres cmd / -U Username.. and db name
@@ -25,7 +25,7 @@ if test "$1" = "att"; then # enter postgres
 if test "$1" == 'q'; then # make life query 
     sudo docker exec "$p_user" psql -U "$p_user" -d "$p_db" -AF' ' --json -c "$2"
     # -F',' to add specific separate symbol
-    # -t for removing columnt names, and row count at the buttom,
+    # -t for removing column names, and row count at the buttom,
     # -A remove psql table formatting
     # --csv making csv format
     exit; fi

@@ -1,8 +1,9 @@
-#!/bin/env python3
+#!/bin/python3
 from os import environ
 from sys import path, argv
 from random import randint
 from time import sleep
+import socket
 
 env = environ.get
 path.append(env("vaava")) # export vaava=/Vaava
@@ -35,7 +36,7 @@ class auto_unit(psql):
         self.hostname = env('HOSTNAME') # identify container
         if self.hostname == None: self.hostname = "main"
         
-        
+    
     def init_unit(self) -> bool:
         self.exec(f"""
                   select id, state, container_id 
@@ -83,6 +84,6 @@ class auto_unit(psql):
 
 if __name__ == "__main__":
     b1 = auto_unit(argv[1])
-    x = b1.init_unit()
+    # x = b1.init_unit()
     print(x)
 
