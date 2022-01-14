@@ -4,6 +4,7 @@ import socket
 from threading import Thread
 from os import environ
 from sys import path
+from time import sleep
 
 env = environ.get
 path.append(env("vaava"))
@@ -14,6 +15,7 @@ from sql.sql_query import psql
 class Manager(psql):
     def __init__(self) -> None:
         psql.__init__(self)
+        self.client_pool = {}
 
         self.exec('''
                   update unit 
@@ -21,6 +23,10 @@ class Manager(psql):
                   where fraction = 'Main';''')
         
         self.init_server()
+
+
+
+
 
     def init_server(self) -> None:
         sock = socket.socket()
@@ -33,8 +39,21 @@ class Manager(psql):
         while True:
             conn, addr = sock.accept()
             print(f"Connected by: {addr}")
-            Thread(target=self.create_thread, args=(conn,)).start()
+            x = Thread(target=self.create_thread, args=(conn,), daemon=True)
+            x.start()
+            
             # creating thread, for new client
+
+            
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
             
     def create_thread(self, conn):
         check_available_unit = self.exec('''
@@ -50,7 +69,15 @@ class Manager(psql):
         else:
             no_msg = bytes('no', 'utf-8')
             conn.sendall(no_msg)
-            
+        
+        while True:
+            try:
+                conn.sendall(b'None')
+                sleep(1)
+                print('good')
+            except Exception as er:
+                print('fail', er)
+                break
         # while True:
             # data = conn.recv(1024)
             # if data:
