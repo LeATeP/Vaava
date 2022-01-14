@@ -15,8 +15,8 @@ from sql.sql_query import psql
 class Manager(psql):
     def __init__(self) -> None:
         psql.__init__(self)
-        self.client_pool = {}
-
+        self.thread_dict = {}
+        
         self.exec('''
                   update unit 
                   set state = 'idle', container_id = null 
@@ -39,8 +39,7 @@ class Manager(psql):
         while True:
             conn, addr = sock.accept()
             print(f"Connected by: {addr}")
-            x = Thread(target=self.create_thread, args=(conn,), daemon=True)
-            x.start()
+            Thread(target=self.create_thread, args=(conn,), daemon=True).start()
             
             # creating thread, for new client
 
@@ -62,33 +61,32 @@ class Manager(psql):
                                         limit 1;''')
         unit = self.fetch_dict()
         print(unit)
-        if unit:
-            id = str(unit[0]['id'])
-            encoded = bytes(id, 'utf-8')
-            conn.sendall(encoded)
-        else:
-            no_msg = bytes('no', 'utf-8')
-            conn.sendall(no_msg)
+        if not unit:
+            conn.sendall(b'False')
+            return
         
-        while True:
+        unit_id = str(unit[0]['id'])
+        self.thread_dict[unit_id] = True
+        
+        encoded = bytes(unit_id, 'utf-8')
+        conn.sendall(encoded)
+
+        while self.thread_dict[unit_id] == True:
             try:
-                conn.sendall(b'None')
+                conn.sendall(b'True')
                 sleep(1)
                 print('good')
             except Exception as er:
                 print('fail', er)
-                break
-        # while True:
-            # data = conn.recv(1024)
-            # if data:
-                
+                self.create_thread[unit_id] == False
+                break # if client is broken, break loop, and no else continuation 
+        else: # if False, inform server to terminate
+            conn.sendall(b'False')
+            return
+            
+            
 
-Manager()
+
+if __name__ == "__main__":    
+    Manager()
     
-# while True:
-    # data = conn.recv(1024)
-    # if data:
-        # print(f"received {data} \nsending back response...")
-        # msg_back = f"You send: {data}"
-        # msg_bytes = bytes(msg_back, 'utf-8')
-        # conn.sendall(b"received")

@@ -14,13 +14,12 @@ class conn_to_main_server:
         self.sock = socket.socket()
         self.sock.connect(addr)
 
-        unit_id = self.sock.recv(1024)
+        unit_id = self.sock.recv(10)
         print(unit_id)
         while True:
-            msg = self.sock.recv(255)
-            # sleep(100)
+            msg = self.sock.recv(10)
         # if unit_id:
-            # Thread(target=self.wait_signals, daemon=True).start()
+            # Thread(target=self.wait_signals).start()
 
 
     def maintaining_connection(self):
