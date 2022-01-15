@@ -16,8 +16,11 @@ class conn_to_main_server:
 
         unit_id = self.sock.recv(10)
         print(unit_id)
-        while True:
+        
+        msg = ''
+        while msg != b'False':
             msg = self.sock.recv(10)
+            print(msg)
         # if unit_id:
             # Thread(target=self.wait_signals).start()
 

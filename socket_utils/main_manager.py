@@ -58,30 +58,35 @@ class Manager(psql):
         check_available_unit = self.exec('''
                                         select id from unit 
                                         where state = 'idle' and fraction = 'Main'
-                                        limit 1;''')
+                                        order by id limit 1;''')
         unit = self.fetch_dict()
         print(unit)
         if not unit:
-            conn.sendall(b'False')
+            conn.send(b'False')
             return
+        
         
         unit_id = str(unit[0]['id'])
         self.thread_dict[unit_id] = True
         
+        self.exec(f'''update unit set state = 'working' where id = '{unit_id}';''')
+
         encoded = bytes(unit_id, 'utf-8')
-        conn.sendall(encoded)
+        conn.send(encoded); sleep(0.01)
 
         while self.thread_dict[unit_id] == True:
             try:
-                conn.sendall(b'True')
+                conn.send(b'True')
                 sleep(1)
                 print('good')
+                self.thread_dict[unit_id] = False
             except Exception as er:
-                print('fail', er)
-                self.create_thread[unit_id] == False
-                break # if client is broken, break loop, and no else continuation 
+                print('error', er)
+                self.thread_dict[unit_id] = False
+                print(self.thread_dict)
+                break # if client is broken, break loop, and no continuation 
         else: # if False, inform server to terminate
-            conn.sendall(b'False')
+            conn.send(b'False')
             return
             
             
