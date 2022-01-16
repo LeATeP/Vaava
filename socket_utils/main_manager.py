@@ -72,22 +72,29 @@ class Manager(psql):
         self.exec(f'''update unit set state = 'working' where id = '{unit_id}';''')
 
         encoded = bytes(unit_id, 'utf-8')
-        conn.send(encoded); sleep(0.01)
+        conn.send(encoded); sleep(0.1) # sleep to interrupt continuous sending data / mixing up
 
         while self.thread_dict[unit_id] == True:
             try:
                 conn.send(b'True')
                 sleep(1)
-                print('good')
-                self.thread_dict[unit_id] = False
+                print(f'{unit_id}, {self.thread_dict[unit_id]} good')
             except Exception as er:
                 print('error', er)
                 self.thread_dict[unit_id] = False
                 print(self.thread_dict)
+                self.default_sql_unit_data
                 break # if client is broken, break loop, and no continuation 
         else: # if False, inform server to terminate
+            self.default_sql_unit_data()
             conn.send(b'False')
             return
+        
+    def default_sql_unit_data(self, unit_id):
+        self.exec(f'''
+                  update unit 
+                  set state = 'idle', container_id = null
+                  where id = {unit_id};''')
             
             
 

@@ -1,5 +1,6 @@
 #!/bin/python3
 
+from base64 import decode
 import socket
 from threading import Thread
 from time import sleep
@@ -10,24 +11,18 @@ class conn_to_main_server:
     def __init__(self) -> None:
         server_ip = ''
         addr = (server_ip, 9999)
-
         self.sock = socket.socket()
         self.sock.connect(addr)
 
-        unit_id = self.sock.recv(10)
-        print(unit_id)
+        data = self.sock.recv(10).decode('utf-8')
         
-        msg = ''
-        while msg != b'False':
-            msg = self.sock.recv(10)
-            print(msg)
-        # if unit_id:
-            # Thread(target=self.wait_signals).start()
-
-
-    def maintaining_connection(self):
-        # get unit_id to associate yourself with
-        pass
+        if data != 'False':
+            self.unit_id = int(data)
+            
+            msg = b'True'
+            while msg == b'True': # maintaining connection so server know that unit is alive
+                msg = self.sock.recv(10)
+                print(msg)
     
     
 if __name__ == '__main__':
