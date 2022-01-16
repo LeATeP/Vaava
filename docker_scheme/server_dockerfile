@@ -1,0 +1,13 @@
+#!/bin/bash
+
+sudo docker run -t --rm \
+    --name main_server \
+    --network p_net \
+    --network-alias main_server \
+    -v /home/leatep/code/Vaava:/Va \
+    -e vaava=/Va \
+    -e PSQL_HOST=postgres \
+    -e PSQL_USER=postgres \
+    -e PSQL_DB=sql \
+    -e PGPASSWORD=123 \
+    alpine_python /Va/socket_utils/main_manager.py
