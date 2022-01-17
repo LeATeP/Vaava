@@ -77,16 +77,27 @@ class Manager(psql):
         while self.thread_dict[unit_id] == True:
             try:
                 conn.send(b'True')
+                
+                for _ in range(0,5):
+                    return_confirmation = conn.recv(10)
+                    if return_confirmation == b'True':
+                        break
+                    sleep(0.1)
+                else:
+                    print('raising exception')
+                    raise Exception
+                    
                 sleep(1)
+                
                 print(f'{unit_id}, {self.thread_dict[unit_id]} good')
             except Exception as er:
                 print('error', er)
                 self.thread_dict[unit_id] = False
                 print(self.thread_dict)
-                self.default_sql_unit_data
+                self.default_sql_unit_data(unit_id)
                 break # if client is broken, break loop, and no continuation 
         else: # if False, inform server to terminate
-            self.default_sql_unit_data()
+            self.default_sql_unit_data(unit_id)
             conn.send(b'False')
             return
         

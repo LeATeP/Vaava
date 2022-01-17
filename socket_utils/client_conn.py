@@ -1,15 +1,10 @@
 #!/bin/python3
 
-from base64 import decode
 import socket
-from threading import Thread
-from time import sleep
-
-
 
 class conn_to_main_server:
     def __init__(self) -> None:
-        server_ip = ''
+        server_ip = 'main_server'
         addr = (server_ip, 9999)
         self.sock = socket.socket()
         self.sock.connect(addr)
@@ -22,7 +17,9 @@ class conn_to_main_server:
             msg = b'True'
             while msg == b'True': # maintaining connection so server know that unit is alive
                 msg = self.sock.recv(10)
-                print(msg)
+                if msg:
+                    self.sock.send(b'True')
+                    print(msg)
     
     
 if __name__ == '__main__':
