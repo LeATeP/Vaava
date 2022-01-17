@@ -78,25 +78,18 @@ class Manager(psql):
             try:
                 conn.send(b'True')
                 
-                for _ in range(0,5):
-                    return_confirmation = conn.recv(10)
-                    if return_confirmation == b'True':
-                        break
-                    sleep(0.1)
-                else:
-                    print('raising exception')
-                    raise Exception
-                    
-                sleep(1)
-                
-                print(f'{unit_id}, {self.thread_dict[unit_id]} good')
+                sleep(0.1) # to give client time to send msg back (not necessary)
+                send_confirmation = conn.recv(10)
+                if send_confirmation == b'True':
+                    print(f'{unit_id}, {self.thread_dict[unit_id]} good')
+                    sleep(1) # 1 check per sec is enough
+                    continue
+                raise Exception
             except Exception as er:
                 print('error', er)
                 self.thread_dict[unit_id] = False
-                print(self.thread_dict)
-                self.default_sql_unit_data(unit_id)
-                break # if client is broken, break loop, and no continuation 
         else: # if False, inform server to terminate
+            self.thread_dict.pop(unit_id)
             self.default_sql_unit_data(unit_id)
             conn.send(b'False')
             return

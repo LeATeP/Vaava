@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import socket
+from time import sleep
 
 class conn_to_main_server:
     def __init__(self) -> None:
