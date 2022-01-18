@@ -91,7 +91,6 @@ class Manager(psql):
         else: # if False, inform server to terminate
             self.thread_dict.pop(unit_id)
             self.default_sql_unit_data(unit_id)
-            conn.send(b'False')
             return
         
     def default_sql_unit_data(self, unit_id):
