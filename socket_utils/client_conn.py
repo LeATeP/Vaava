@@ -10,6 +10,7 @@ class conn_to_main_server:
         server_ip = 'main_server'
         addr = (server_ip, 9999)
         self.sock = socket.socket()
+        self.sock.setblocking(1)
         self.sock.connect(addr)
 
         data = self.sock.recv(10).decode('utf-8')
@@ -18,19 +19,22 @@ class conn_to_main_server:
             self.unit_id = data
             Thread(target=self.main_loop, daemon=True).start()
         else:
+            print('no data from server')
             quit()
             
             
     def main_loop(self):
-        msg = b'True'
         try:
-            while msg == b'True' and self.running == True: # maintaining connection so server know that unit is alive
+            while self.running == True: # maintaining connection so server know that unit is alive
                 msg = self.sock.recv(10)
-                print(msg)
-                if msg:
+                if msg == b'True':
                     self.sock.send(b'True')
+                    continue
+                break
+            print('raising exception')
             raise BaseException
         except BaseException as er:
+            self.running = False
             print(er.args)
             quit()
                 
