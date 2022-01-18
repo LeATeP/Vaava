@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo docker run -t --rm \
+sudo docker run -d \
     --name main_server \
     --network p_net \
     --network-alias main_server \

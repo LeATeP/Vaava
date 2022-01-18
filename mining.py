@@ -1,11 +1,8 @@
 #!/bin/env python3
 from os import environ
-from sqlite3 import connect
 from sys import path
 from random import randint
 from time import sleep
-from threading import Thread
-from socket import socket
 
 env = environ.get
 path.append(env("vaava"))
@@ -30,7 +27,6 @@ class mining(psql, conn_to_main_server):
                 sleep(0.1)
                 
                 drop = self.gen_drop()
-                print(fg_rgb(drop))
                 for item in drop:
                     res = self.exec(f'''update items
                     set amount = amount + {drop[item]}

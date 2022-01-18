@@ -16,7 +16,6 @@ class conn_to_main_server:
         print(data)
         if data != 'False':
             self.unit_id = data
-            
             Thread(target=self.main_loop, daemon=True).start()
         else:
             quit()
@@ -27,6 +26,7 @@ class conn_to_main_server:
         try:
             while msg == b'True' and self.running == True: # maintaining connection so server know that unit is alive
                 msg = self.sock.recv(10)
+                print(msg)
                 if msg:
                     self.sock.send(b'True')
             raise BaseException

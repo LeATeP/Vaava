@@ -8,4 +8,4 @@ sudo docker run -d --rm \
     -e PSQL_USER=postgres \
     -e PSQL_DB=sql \
     -e PGPASSWORD=123 \
-    alpine_python /Va/socket_utils/client_conn.py
+    alpine_python /Va/mining.py
