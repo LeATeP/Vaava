@@ -6,7 +6,8 @@ from threading import Thread
 
 class conn_to_main_server:
     def __init__(self) -> None:
-        server_ip = ''
+        self.running = True
+        server_ip = 'main_server'
         addr = (server_ip, 9999)
         self.sock = socket.socket()
         self.sock.connect(addr)
@@ -16,23 +17,22 @@ class conn_to_main_server:
         if data != 'False':
             self.unit_id = data
             
-            Thread(target=self.main_loop).start()
+            Thread(target=self.main_loop, daemon=True).start()
+        else:
+            quit()
             
             
     def main_loop(self):
         msg = b'True'
         try:
-            while msg == b'True': # maintaining connection so server know that unit is alive
+            while msg == b'True' and self.running == True: # maintaining connection so server know that unit is alive
                 msg = self.sock.recv(10)
                 if msg:
                     self.sock.send(b'True')
-                else:
-                    print('quit')
-                    quit()
-            else:
-                print('fail')
+            raise BaseException
         except BaseException as er:
             print(er.args)
+            quit()
                 
     
 if __name__ == '__main__':

@@ -60,17 +60,14 @@ class Manager(psql):
                                         where state = 'idle' and fraction = 'Main'
                                         order by id limit 1;''')
         unit = self.fetch_dict()
-        print(unit)
         if not unit:
             conn.send(b'False')
             return
         
-        
+        print(unit)
         unit_id = str(unit[0]['id'])
         self.thread_dict[unit_id] = True
         
-        self.exec(f'''update unit set state = 'working' where id = '{unit_id}';''')
-
         encoded = bytes(unit_id, 'utf-8')
         conn.send(encoded); sleep(0.1) # sleep to interrupt continuous sending data / mixing up
 
@@ -98,7 +95,6 @@ class Manager(psql):
                   update unit 
                   set state = 'idle', container_id = null
                   where id = {unit_id};''')
-            
             
 
 

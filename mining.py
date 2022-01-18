@@ -1,37 +1,34 @@
 #!/bin/env python3
 from os import environ
+from sqlite3 import connect
 from sys import path
 from random import randint
 from time import sleep
+from threading import Thread
+from socket import socket
 
 env = environ.get
 path.append(env("vaava"))
 from sql.sql_query import psql
 from utils.colors import fg_rgb
+from socket_utils.client_conn import conn_to_main_server
 
-class mining(psql):
+class mining(psql, conn_to_main_server):
     def __init__(self) -> None:
         psql.__init__(self)
-        # self.host_name = env('HOSTNAME')
+        conn_to_main_server.__init__(self)
+        self.host_name = env('HOSTNAME')
+        
+        self.exec(f'''
+                  update unit 
+                  set state = 'mining', container_id = '{self.host_name}'
+                  where id = {self.unit_id};''')
 
     def start_work(self):
         try:
-            self.exec('''select id from unit
-                       where state = 'idle' limit 1;''')
-            data = self.fetch_dict()
-            # if no worker are available then break
-            if not data:
-                raise Exception('no worker are Free')
-
-            # change worker status on True
-            id = data[0]['id']
-            self.exec(f'''update unit set state = 'mining'
-                        where id = {id} returning state;''')
-                
-            
-            good = True    
-            while good:
+            while self.running:
                 sleep(0.1)
+                
                 drop = self.gen_drop()
                 print(fg_rgb(drop))
                 for item in drop:
@@ -39,13 +36,10 @@ class mining(psql):
                     set amount = amount + {drop[item]}
                     where name = '{item}';''')
                     if not res:
-                        good = False; continue
-
-
-                
-                
-                
-        except (Exception) as error:
+                        self.running = False 
+            print('probably storage is full')
+            raise BaseException
+        except BaseException as error:
             print(error.args)
         
     def gen_drop(self):
