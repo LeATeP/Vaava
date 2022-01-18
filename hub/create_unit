@@ -14,7 +14,7 @@ class work_class(psql):
         psql.__init__(self)
         
         self.req_resource = 'energy_rock'
-        self.summom_cost = 10
+        self.summom_cost = 100
     
     def start_work(self):
         try:
@@ -27,16 +27,15 @@ class work_class(psql):
             
             print('Your balance:', amount[0]['amount'])
             
-            self.exec('''insert into unit (name) 
+            self.exec('''insert into unit (race) 
                                 values ('Human') 
-                                returning *;''')
-            unit = self.fetch_dict()
+                                returning id, name, state, grade, level, max_hp, attack;''')
+            unit = self.fetch_dict()[0]
             
-            self.exec(f'''insert into unit_info (unit_id)
-                              values ({unit[0]['id']})
-                              returning *;''')
-            unit_info = self.fetch_dict()
-            [print(f"{i}: {unit[0][i]}") for i in unit[0]]
+            unit_info = ''
+            for n in unit:
+                unit_info += f'{n}: {unit[n]}\n'
+            
             print(fg_rgb(unit_info))
         except (Exception) as error:
             print(error.args)
