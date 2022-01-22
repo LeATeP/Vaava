@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo docker run -d \
+    --restart unless-stopped \
     --name main_server \
     --network p_net \
     --network-alias main_server \
