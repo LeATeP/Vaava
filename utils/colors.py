@@ -29,8 +29,8 @@ def fg_rgb(text):
     
 
 # pipe_line
-if argv[1] == "p":
-    color = fg_color()
-    for n in stdin.readlines():
-        n = n.strip('\n')
-        print(color.put_color(n))
+# if argv[1] == "p":
+    # color = fg_color()
+    # for n in stdin.readlines():
+        # n = n.strip('\n')
+        # print(color.put_color(n))

@@ -27,7 +27,7 @@ class mining(psql, conn_to_main_server):
                 sleep(1)
                 
                 drop = self.gen_drop()
-                print(drop)
+                print(fg_rgb(drop))
                 for item in drop:
                     res = self.exec(f'''update items
                     set amount = amount + {drop[item]}

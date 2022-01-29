@@ -46,9 +46,9 @@ class fetch_data():
 
     def first_sql_line(self):
         if len(argv) > 1: # table
-            self.cmd = f'select * from {argv[1]}\n'
+            self.cmd = f'select id, state, container_id from {argv[1]}\n'
         else:
-            self.cmd = f'select * from items\n'
+            self.cmd = f'select id, name, amount from items\n'
 
     def second_sql_line(self):
         keys = {'-i': 'id =',
