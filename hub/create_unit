@@ -27,9 +27,9 @@ class work_class(psql):
             
             print('Your balance:', amount[0]['amount'])
             
-            self.exec('''insert into unit (race) 
-                                values ('Human') 
-                                returning id, name, state, grade, level, max_hp, attack;''')
+            self.exec('''insert into unit (name) 
+                                values ('Kai') 
+                                returning id, name, state, fraction, level, job;''')
             unit = self.fetch_dict()[0]
             
             unit_info = ''

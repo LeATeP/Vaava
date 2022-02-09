@@ -24,10 +24,6 @@ class Manager(psql):
         
         self.init_server()
 
-
-
-
-
     def init_server(self) -> None:
         sock = socket.socket()
         addr = ('0.0.0.0', 9999)  # ip will change to 'main_server' after main_server container is created
@@ -42,17 +38,6 @@ class Manager(psql):
             Thread(target=self.create_thread, args=(conn,), daemon=True).start()
             
             # creating thread, for new client
-
-            
- 
- 
- 
- 
- 
- 
- 
- 
- 
             
     def create_thread(self, conn):
         check_available_unit = self.exec('''
