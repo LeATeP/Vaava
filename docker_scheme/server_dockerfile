@@ -11,4 +11,4 @@ sudo docker run -d \
     -e PSQL_USER=postgres \
     -e PSQL_DB=sql \
     -e PGPASSWORD=123 \
-    alpine_python /Va/socket_utils/main_manager.py
+    psql_python /Va/socket_utils/main_manager.py
